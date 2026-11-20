@@ -3,152 +3,271 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Just1nPG</title>
+  <meta name="theme-color" content="#0b0e13">
+  <title>Die technologische Zukunft</title>
 
   <style>
     :root {
       color-scheme: dark;
+      --background: #0b0e13;
+      --panel: #151a22;
+      --text: #f3f4f6;
+      --muted: #a7afbd;
       --yellow: #f7d417;
-      --background: #090b0e;
-      --text: #f5f3e9;
+      --line: rgb(255 255 255 / 10%);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       min-height: 100vh;
-      min-height: 100svh;
       margin: 0;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      padding: clamp(1.25rem, 5vw, 4rem);
       background:
-        radial-gradient(ellipse at 50% 45%, #202329 0%, transparent 58%),
-        linear-gradient(135deg, #0d0f12, var(--background) 65%);
+        radial-gradient(ellipse at 75% 5%, rgb(247 212 23 / 9%), transparent 32rem),
+        var(--background);
       color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
     }
 
-    body::before,
-    body::after {
-      position: fixed;
-      z-index: 0;
-      content: "";
-      pointer-events: none;
+    a {
+      color: inherit;
     }
 
-    body::before {
-      width: min(72vw, 700px);
-      aspect-ratio: 1;
-      top: -34%;
-      right: -15%;
-      border: 1px solid rgb(247 212 23 / 14%);
-      border-radius: 50%;
-      box-shadow:
-        0 0 0 45px rgb(247 212 23 / 3%),
-        0 0 0 110px rgb(247 212 23 / 2%);
+    .container {
+      width: min(100% - 2rem, 1060px);
+      margin-inline: auto;
     }
 
-    body::after {
-      width: 42vw;
-      height: 7px;
-      left: -8vw;
-      bottom: 12%;
-      transform: rotate(-35deg);
-      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
-      opacity: 0.75;
+    .site-header {
+      padding: 1.2rem 0;
+      border-bottom: 1px solid var(--line);
     }
 
-    main {
-      position: relative;
-      z-index: 1;
-      width: min(100%, 960px);
-      padding: clamp(2.5rem, 8vw, 6.5rem) clamp(1.5rem, 7vw, 5.5rem);
-      overflow: hidden;
-      border: 1px solid rgb(255 255 255 / 12%);
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgb(29 32 37 / 94%), rgb(16 18 21 / 96%));
-      box-shadow:
-        0 28px 90px rgb(0 0 0 / 55%),
-        inset 0 1px rgb(255 255 255 / 6%);
-      text-align: center;
-      animation: rise-in 700ms ease-out both;
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
-    main::before {
-      position: absolute;
-      top: 0;
-      left: 18%;
-      width: 64%;
-      height: 3px;
-      content: "";
-      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
-      box-shadow: 0 0 24px rgb(247 212 23 / 50%);
+    .brand {
+      color: var(--yellow);
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
     }
 
-    main::after {
-      position: absolute;
-      right: -45px;
-      bottom: -70px;
-      width: 180px;
-      aspect-ratio: 1;
-      content: "";
-      border: 22px solid rgb(247 212 23 / 7%);
-      border-radius: 50%;
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: color 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--yellow);
+    }
+
+    .hero {
+      padding: clamp(4rem, 10vw, 7rem) 0 4rem;
+      animation: appear 700ms ease-out both;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin: 0 0 1rem;
+      color: var(--yellow);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
     }
 
     h1 {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      color: var(--text);
-      font-size: clamp(2rem, 6.5vw, 5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.045em;
-      text-wrap: balance;
+      max-width: 800px;
+      margin-bottom: 1.2rem;
+      font-size: clamp(2.6rem, 8vw, 5.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.055em;
     }
 
-    h1::selection {
-      color: var(--background);
-      background: var(--yellow);
+    h1 span {
+      color: var(--yellow);
     }
 
-    .download-button {
-      position: relative;
-      z-index: 1;
+    .hero-text {
+      max-width: 680px;
+      margin-bottom: 1.8rem;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+    }
+
+    .button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-top: 2rem;
-      padding: 0.9rem 1.4rem;
-      border: 0;
+      min-height: 48px;
+      padding: 0.75rem 1.2rem;
+      border: 1px solid var(--yellow);
       border-radius: 999px;
       background: var(--yellow);
-      color: var(--background);
-      font-size: 1rem;
+      color: #101216;
       font-weight: 700;
       text-decoration: none;
       transition: transform 160ms ease, background-color 160ms ease;
     }
 
-    .download-button:hover {
+    .button:hover {
       transform: translateY(-2px);
       background: #ffe34d;
     }
 
-    .download-button:focus-visible {
-      outline: 3px solid #fff;
+    .button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid white;
       outline-offset: 4px;
     }
 
-    @keyframes rise-in {
+    section {
+      padding: 3.5rem 0;
+      scroll-margin-top: 1rem;
+    }
+
+    .section-heading {
+      max-width: 680px;
+      margin-bottom: 1.8rem;
+    }
+
+    .section-heading h2 {
+      margin-bottom: 0.5rem;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+    }
+
+    .section-heading p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      padding: 1.5rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(145deg, #191f29, var(--panel));
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgb(247 212 23 / 55%);
+    }
+
+    .card-number {
+      display: inline-block;
+      margin-bottom: 0.8rem;
+      color: var(--yellow);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+
+    .card h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .balance-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .balance-card {
+      padding: 1.5rem;
+      border-radius: 18px;
+      background: var(--panel);
+    }
+
+    .balance-card h3 {
+      margin-bottom: 0.7rem;
+      color: var(--yellow);
+    }
+
+    .balance-card ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+    }
+
+    .balance-card li + li {
+      margin-top: 0.35rem;
+    }
+
+    .conclusion {
+      padding: clamp(1.5rem, 5vw, 2.5rem);
+      border: 1px solid rgb(247 212 23 / 30%);
+      border-radius: 20px;
+      background: linear-gradient(120deg, rgb(247 212 23 / 10%), var(--panel));
+    }
+
+    .conclusion p {
+      max-width: 760px;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .download-area {
+      padding-top: 1.5rem;
+    }
+
+    .site-footer {
+      margin-top: 3rem;
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @keyframes appear {
       from {
         opacity: 0;
-        transform: translateY(18px);
+        transform: translateY(14px);
       }
 
       to {
@@ -157,9 +276,19 @@
       }
     }
 
-    @media (max-width: 520px) {
-      main {
-        border-radius: 18px;
+    @media (max-width: 650px) {
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topic-grid,
+      .balance-grid {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 2.5rem 0;
       }
     }
 
@@ -167,19 +296,141 @@
       *,
       *::before,
       *::after {
+        scroll-behavior: auto !important;
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
       }
     }
   </style>
 </head>
+
 <body>
+  <header class="site-header">
+    <nav class="nav container" aria-label="Hauptnavigation">
+      <a class="brand" href="#start">Technologie & Zukunft</a>
+      <div class="nav-links">
+        <a href="#themen">Themen</a>
+        <a href="#chancen-risiken">Chancen & Risiken</a>
+        <a href="#fazit">Fazit</a>
+      </div>
+    </nav>
+  </header>
+
   <main>
-    <h1>Test Technologischer fortschritt BVB</h1>
-    <a class="download-button" href="datei.zip" download>
-      ZIP-Datei herunterladen
-    </a>
+    <div class="container">
+      <section class="hero" id="start">
+        <p class="eyebrow">Test Technologischer fortschritt BVB</p>
+        <h1>Die technologische <span>Zukunft</span></h1>
+        <p class="hero-text">
+          Künstliche Intelligenz, Roboter und digitale Medien verändern unseren
+          Alltag. Sie eröffnen neue Möglichkeiten – bringen aber auch
+          Herausforderungen mit sich.
+        </p>
+        <a class="button" href="#themen">Themen entdecken</a>
+      </section>
+
+      <section id="themen">
+        <div class="section-heading">
+          <h2>Was verändert sich?</h2>
+          <p>
+            Ein kurzer Blick auf einige Bereiche, in denen neue Technologien
+            unser Leben mitgestalten.
+          </p>
+        </div>
+
+        <div class="topic-grid">
+          <article class="card">
+            <span class="card-number">01 / KI</span>
+            <h3>Künstliche Intelligenz</h3>
+            <p>
+              KI erkennt Muster in Daten, beantwortet Fragen und kann beim
+              Lernen oder bei der Arbeit unterstützen.
+            </p>
+          </article>
+
+          <article class="card">
+            <span class="card-number">02 / AUTOMATISIERUNG</span>
+            <h3>Roboter & Medizin</h3>
+            <p>
+              Roboter übernehmen wiederholende Aufgaben. In der Medizin können
+              digitale Systeme Fachkräfte unterstützen.
+            </p>
+          </article>
+
+          <article class="card">
+            <span class="card-number">03 / BILDUNG</span>
+            <h3>Schule & soziale Medien</h3>
+            <p>
+              Digitale Lernmittel und KI können Lernen persönlicher machen.
+              Wichtig bleibt ein bewusster Umgang mit Medien.
+            </p>
+          </article>
+
+          <article class="card">
+            <span class="card-number">04 / MOBILITÄT</span>
+            <h3>Verkehr & Energie</h3>
+            <p>
+              Elektroautos, selbstfahrende Fahrzeuge sowie Wind- und Solarenergie
+              sind Beispiele für mögliche Entwicklungen.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="chancen-risiken">
+        <div class="section-heading">
+          <h2>Chancen und Risiken</h2>
+          <p>
+            Technologie kann vieles erleichtern. Entscheidend ist, wie wir sie
+            entwickeln und nutzen.
+          </p>
+        </div>
+
+        <div class="balance-grid">
+          <article class="balance-card">
+            <h3>Chancen</h3>
+            <ul>
+              <li>Wissen und Kommunikation sind leichter zugänglich.</li>
+              <li>Automatisierung kann Zeit sparen.</li>
+              <li>Technik kann Arbeit und Medizin unterstützen.</li>
+            </ul>
+          </article>
+
+          <article class="balance-card">
+            <h3>Herausforderungen</h3>
+            <ul>
+              <li>Datenschutz und digitale Sicherheit.</li>
+              <li>Zu viel Bildschirmzeit und Abhängigkeit.</li>
+              <li>Veränderungen in Berufen und Arbeitswelt.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="fazit">
+        <div class="conclusion">
+          <div class="section-heading">
+            <h2>Technik bewusst nutzen</h2>
+          </div>
+          <p>
+            Die Technologie wird unseren Alltag weiter verändern. Deshalb ist es
+            wichtig, sich über neue Entwicklungen zu informieren und sowohl ihre
+            Möglichkeiten als auch ihre Risiken im Blick zu behalten.
+          </p>
+
+          <div class="download-area">
+            <a class="button" href="datei.zip" download>
+              ZIP-Datei herunterladen
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
+
+  <footer class="site-footer">
+    <div class="container">Die technologische Zukunft – Chancen verstehen, Risiken bedenken.</div>
+  </footer>
 </body>
 </html>
