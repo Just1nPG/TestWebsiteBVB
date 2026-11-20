@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0e13">
+  <title>Snake</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #0b0e13;
+      --panel: #151a22;
+      --text: #f3f4f6;
+      --muted: #a7afbd;
+      --yellow: #f7d417;
+      --line: rgb(255 255 255 / 10%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 1.25rem;
+      background:
+        radial-gradient(ellipse at 75% 5%, rgb(247 212 23 / 9%), transparent 32rem),
+        var(--background);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    main {
+      width: min(100%, 480px);
+      padding: clamp(1.25rem, 5vw, 2rem);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      text-align: center;
+      animation: appear 500ms ease-out both;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: var(--yellow);
+    }
+
+    h1 {
+      margin: 0 0 0.3rem;
+      font-size: clamp(2rem, 8vw, 3rem);
+    }
+
+    .hint,
+    #status {
+      color: var(--muted);
+    }
+
+    .hint {
+      margin: 0 0 1rem;
+    }
+
+    #score {
+      margin: 1rem 0;
+      color: var(--yellow);
+      font-weight: 700;
+    }
+
+    canvas {
+      display: block;
+      width: min(100%, 400px);
+      height: auto;
+      margin: 0 auto;
+      border: 1px solid rgb(247 212 23 / 30%);
+      border-radius: 12px;
+      background: #0b0e13;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+
+    button {
+      min-height: 46px;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--yellow);
+      border-radius: 999px;
+      background: var(--yellow);
+      color: #101216;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 160ms ease, background-color 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: #ffe34d;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid white;
+      outline-offset: 4px;
+    }
+
+    .directions {
+      display: grid;
+      grid-template-columns: repeat(3, 52px);
+      justify-content: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+    }
+
+    .directions button {
+      min-height: 46px;
+      padding: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .directions .empty {
+      visibility: hidden;
+    }
+
+    #status {
+      min-height: 1.5em;
+      margin: 1rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back-link" href="index.html">← Zurück zur Startseite</a>
+    <h1>Snake</h1>
+    <p class="hint">Sammle die gelben Punkte – aber beiß dich nicht selbst!</p>
+
+    <p id="score" aria-live="polite">Punkte: 0</p>
+
+    <canvas id="game" width="400" height="400" aria-label="Snake-Spielfeld"></canvas>
+
+    <div class="buttons">
+      <button id="start-button" type="button">Spiel starten</button>
+      <button id="pause-button" type="button" disabled>Pause</button>
+    </div>
+
+    <div class="directions" aria-label="Steuerung">
+      <span class="empty" aria-hidden="true"></span>
+      <button type="button" data-direction="up" aria-label="Nach oben">↑</button>
+      <span class="empty" aria-hidden="true"></span>
+      <button type="button" data-direction="left" aria-label="Nach links">←</button>
+      <button type="button" data-direction="down" aria-label="Nach unten">↓</button>
+      <button type="button" data-direction="right" aria-label="Nach rechts">→</button>
+    </div>
+
+    <p id="status" aria-live="polite">Nutze Pfeiltasten, WASD oder die Buttons.</p>
+  </main>
+
+  <script>
+    const canvas = document.querySelector("#game");
+    const context = canvas.getContext("2d");
+    const scoreDisplay = document.querySelector("#score");
+    const statusDisplay = document.querySelector("#status");
+    const startButton = document.querySelector("#start-button");
+    const pauseButton = document.querySelector("#pause-button");
+
+    const gridSize = 20;
+    const cellSize = canvas.width / gridSize;
+
+    let snake;
+    let food;
+    let direction;
+    let nextDirection;
+    let score;
+    let timer = null;
+    let gameOver = false;
+
+    function randomFood() {
+      let position;
+
+      do {
+        position = {
+          x: Math.floor(Math.random() * gridSize),
+          y: Math.floor(Math.random() * gridSize)
+        };
+      } while (snake.some((segment) => segment.x === position.x && segment.y === position.y));
+
+      return position;
+    }
+
+    function draw() {
+      context.fillStyle = "#0b0e13";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      context.strokeStyle = "rgb(255 255 255 / 5%)";
+      context.lineWidth = 1;
+
+      for (let cell = 1; cell < gridSize; cell++) {
+        const position = cell * cellSize;
+        context.beginPath();
+        context.moveTo(position, 0);
+        context.lineTo(position, canvas.height);
+        context.moveTo(0, position);
+        context.lineTo(canvas.width, position);
+        context.stroke();
+      }
+
+      context.fillStyle = "#f7d417";
+      context.beginPath();
+      context.arc(
+        (food.x + 0.5) * cellSize,
+        (food.y + 0.5) * cellSize,
+        cellSize * 0.34,
+        0,
+        Math.PI * 2
+      );
+      context.fill();
+
+      snake.forEach((segment, index) => {
+        context.fillStyle = index === 0 ? "#ffe34d" : "#f7d417";
+        context.fillRect(
+          segment.x * cellSize + 1,
+          segment.y * cellSize + 1,
+          cellSize - 2,
+          cellSize - 2
+        );
+      });
+    }
+
+    function resetGame() {
+      snake = [
+        { x: 9, y: 10 },
+        { x: 8, y: 10 },
+        { x: 7, y: 10 }
+      ];
+      direction = { x: 1, y: 0 };
+      nextDirection = { x: 1, y: 0 };
+      score = 0;
+      gameOver = false;
+      food = randomFood();
+      scoreDisplay.textContent = "Punkte: 0";
+      statusDisplay.textContent = "Nutze Pfeiltasten, WASD oder die Buttons.";
+      draw();
+    }
+
+    function startGame() {
+      if (timer !== null) {
+        return;
+      }
+
+      if (gameOver) {
+        resetGame();
+      }
+
+      timer = setInterval(moveSnake, 120);
+      startButton.textContent = "Neu starten";
+      pauseButton.disabled = false;
+      statusDisplay.textContent = "Viel Spaß!";
+    }
+
+    function pauseGame() {
+      if (timer === null) {
+        return;
+      }
+
+      clearInterval(timer);
+      timer = null;
+      pauseButton.textContent = "Weiter";
+      statusDisplay.textContent = "Spiel pausiert.";
+    }
+
+    function resumeGame() {
+      if (timer !== null || gameOver) {
+        return;
+      }
+
+      timer = setInterval(moveSnake, 120);
+      pauseButton.textContent = "Pause";
+      statusDisplay.textContent = "Weiter geht's!";
+    }
+
+    function endGame() {
+      clearInterval(timer);
+      timer = null;
+      gameOver = true;
+      pauseButton.disabled = true;
+      pauseButton.textContent = "Pause";
+      statusDisplay.textContent = `Game Over! Du hast ${score} Punkte.`;
+    }
+
+    function moveSnake() {
+      direction = nextDirection;
+
+      const head = {
+        x: snake[0].x + direction.x,
+        y: snake[0].y + direction.y
+      };
+
+      const eating = head.x === food.x && head.y === food.y;
+      const bodyToCheck = eating ? snake : snake.slice(0, -1);
+      const hitWall =
+        head.x < 0 ||
+        head.x >= gridSize ||
+        head.y < 0 ||
+        head.y >= gridSize;
+      const hitSnake = bodyToCheck.some(
+        (segment) => segment.x === head.x && segment.y === head.y
+      );
+
+      if (hitWall || hitSnake) {
+        endGame();
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (eating) {
+        score += 1;
+        scoreDisplay.textContent = `Punkte: ${score}`;
+        food = randomFood();
+      } else {
+        snake.pop();
+      }
+
+      draw();
+    }
+
+    function changeDirection(name) {
+      const directions = {
+        up: { x: 0, y: -1 },
+        down: { x: 0, y: 1 },
+        left: { x: -1, y: 0 },
+        right: { x: 1, y: 0 }
+      };
+
+      const chosen = directions[name];
+
+      if (!chosen || (chosen.x === -nextDirection.x && chosen.y === -nextDirection.y)) {
+        return;
+      }
+
+      nextDirection = chosen;
+
+      if (timer === null && !gameOver) {
+        startGame();
+      }
+    }
+
+    document.addEventListener("keydown", (event) => {
+      const keys = {
+        ArrowUp: "up",
+        w: "up",
+        W: "up",
+        ArrowDown: "down",
+        s: "down",
+        S: "down",
+        ArrowLeft: "left",
+        a: "left",
+        A: "left",
+        ArrowRight: "right",
+        d: "right",
+        D: "right"
+      };
+
+      const chosen = keys[event.key];
+
+      if (chosen) {
+        event.preventDefault();
+        changeDirection(chosen);
+      }
+    });
+
+    document.querySelectorAll("[data-direction]").forEach((button) => {
+      button.addEventListener("click", () => {
+        changeDirection(button.dataset.direction);
+      });
+    });
+
+    startButton.addEventListener("click", () => {
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+
+      resetGame();
+      startGame();
+    });
+
+    pauseButton.addEventListener("click", () => {
+      if (timer === null) {
+        resumeGame();
+      } else {
+        pauseGame();
+      }
+    });
+
+    resetGame();
+  </script>
+</body>
+</html>
