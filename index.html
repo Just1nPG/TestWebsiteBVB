@@ -117,6 +117,34 @@
       background: var(--yellow);
     }
 
+    .download-button {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2rem;
+      padding: 0.9rem 1.4rem;
+      border: 0;
+      border-radius: 999px;
+      background: var(--yellow);
+      color: var(--background);
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 160ms ease, background-color 160ms ease;
+    }
+
+    .download-button:hover {
+      transform: translateY(-2px);
+      background: #ffe34d;
+    }
+
+    .download-button:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 4px;
+    }
+
     @keyframes rise-in {
       from {
         opacity: 0;
@@ -149,6 +177,9 @@
 <body>
   <main>
     <h1>Test Technologischer fortschritt BVB</h1>
+    <a class="download-button" href="datei.zip" download>
+      ZIP-Datei herunterladen
+    </a>
   </main>
 </body>
 </html>
